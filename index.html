@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>McMaster | PID Speed Control Laboratory</title>
+
+    <link rel="icon" href="Assets/favicon.png" type="image/x-icon">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Typography -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+
+    <!-- Syntax Highlighting -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+
+    <style>
+        :root {
+            --mac-maroon: #7A003C;
+            --mac-gold: #FDBF57;
+            --mac-grey: #495965;
+
+            --mac-maroon-20: #E4CCDA;
+            --mac-maroon-40: #CA99B1;
+            --mac-maroon-60: #AF6689;
+            --mac-maroon-80: #953360;
+
+            --mac-gold-20: #FFF2DD;
+            --mac-gold-40: #FEE5BC;
+            --mac-gold-60: #FED999;
+            --mac-gold-80: #FECC78;
+
+            --mac-grey-20: #DBDEE0;
+            --mac-grey-40: #B6BDC1;
+            --mac-grey-60: #929BA3;
+            --mac-grey-80: #6D7A82;
+
+            --lab-background: #F7F8FA;
+            --lab-surface: #FFFFFF;
+            --lab-text: #2D3338;
+            --lab-code: #282C34;
+            --success: #287A4B;
+            --warning: #9A5C00;
+            --danger: #B42318;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--lab-background);
+            color: var(--lab-text);
+            overflow-x: hidden;
+        }
+
+        code,
+        pre,
+        .font-mono {
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        .gradient-text {
+            background: linear-gradient(
+                135deg,
+                var(--mac-maroon) 0%,
+                var(--mac-maroon-80) 62%,
+                var(--mac-gold) 100%
+            );
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(
+                135deg,
+                var(--mac-maroon) 0%,
+                var(--mac-maroon-80) 65%,
+                var(--mac-gold) 100%
+            );
+        }
+
+        .card {
+            background: var(--lab-surface);
+            border-radius: 16px;
+            border: 1px solid rgba(73, 89, 101, 0.10);
+            box-shadow:
+                0 10px 18px -8px rgba(0, 0, 0, 0.16),
+                0 4px 8px -4px rgba(0, 0, 0, 0.08);
+        }
+
+        .stage-panel {
+            display: none;
+        }
+
+        body.stage-0 .stage-panel.stage-0,
+        body.stage-1 .stage-panel.stage-1,
+        body.stage-2 .stage-panel.stage-2,
+        body.stage-3 .stage-panel.stage-3,
+        body.stage-4 .stage-panel.stage-4,
+        body.stage-5 .stage-panel.stage-5 {
+            display: block;
+        }
+
+        /* -------------------- STAGE NAVIGATION -------------------- */
+        .stage-bar {
+            position: fixed;
+            inset: 0 0 auto 0;
+            z-index: 40;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(73, 89, 101, 0.12);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+        }
+
+        .stage-bar-inner {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 0.75rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            overflow-x: auto;
+        }
+
+        .stage-label {
+            flex: 0 0 auto;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--mac-grey-80);
+            margin-right: 0.3rem;
+        }
+
+        .stage-btn {
+            flex: 0 0 auto;
+            position: relative;
+            padding: 0.55rem 0.95rem;
+            border-radius: 9px;
+            border: 1px solid transparent;
+            font-size: 0.83rem;
+            font-weight: 600;
+            color: var(--mac-grey);
+            background: transparent;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .stage-btn:hover {
+            background: var(--mac-grey-20);
+        }
+
+        .stage-btn.active {
+            color: white;
+            background: var(--mac-maroon);
+            box-shadow: 0 5px 13px rgba(122, 0, 60, 0.28);
+        }
+
+        .stage-btn.completed:not(.active)::after {
+            content: "✓";
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            margin-left: 6px;
+            border-radius: 50%;
+            color: white;
+            background: var(--success);
+            font-size: 0.68rem;
+            font-weight: 700;
+        }
+
+        /* -------------------- SIDEBARS -------------------- */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            height: 100vh;
+            width: min(500px, calc(100vw - 48px));
+            background: white;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.22);
+            z-index: 60;
+            transition: transform 0.38s cubic-bezier(0.25, 1, 0.5, 1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        #hardwareSidebar {
+            left: 0;
+            transform: translateX(-100%);
+        }
+
+        #hardwareSidebar.active {
+            transform: translateX(0);
+        }
+
+        #softwareSidebar {
+            right: 0;
+            transform: translateX(100%);
+        }
+
+        #softwareSidebar.active {
+            transform: translateX(0);
+        }
+
+        .sidebar-handle {
+            position: absolute;
+            top: 50%;
+            width: 34px;
+            height: 62px;
+            background: var(--mac-maroon);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            z-index: 65;
+        }
+
+        .sidebar-handle:hover {
+            background: var(--mac-maroon-80);
+        }
+
+        #handle-hw {
+            right: -34px;
+            border-radius: 0 9px 9px 0;
+            box-shadow: 4px 0 12px rgba(0, 0, 0, 0.16);
+        }
+
+        #handle-sw {
+            left: -34px;
+            border-radius: 9px 0 0 9px;
+            box-shadow: -4px 0 12px rgba(0, 0, 0, 0.16);
+        }
+
+        .handle-icon {
+            transition: transform 0.4s ease;
+            stroke-width: 3px;
+        }
+
+        #hardwareSidebar.active #handle-hw .handle-icon,
+        #softwareSidebar.active #handle-sw .handle-icon {
+            transform: rotate(180deg);
+        }
+
+        /* -------------------- COMPONENTS -------------------- */
+        .time-badge {
+            flex: 0 0 auto;
+            font-size: 0.76rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--mac-grey);
+            background: var(--mac-grey-20);
+            padding: 6px 10px;
+            border-radius: 8px;
+        }
+
+        .briefing-card {
+            background: #F8FAFC;
+            border-radius: 12px;
+            padding: 18px;
+            border-left: 4px solid var(--mac-maroon);
+        }
+
+        .warning-card {
+            background: var(--mac-gold-20);
+            border: 1px solid var(--mac-gold-60);
+            border-left: 5px solid var(--mac-gold);
+            color: #5B3900;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .danger-card {
+            background: #FFF3F2;
+            border: 1px solid #FECACA;
+            border-left: 5px solid var(--danger);
+            color: #7A271A;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .success-card {
+            background: #EFFAF3;
+            border: 1px solid #B7E4C7;
+            border-left: 5px solid var(--success);
+            color: #174D2D;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .code-header {
+            background: #EEF1F4;
+            padding: 8px 14px;
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid #DCE2E8;
+            overflow-x: auto;
+        }
+
+        .code-tab {
+            flex: 0 0 auto;
+            padding: 7px 13px;
+            border-radius: 7px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--mac-grey);
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .code-tab:hover {
+            background: rgba(255, 255, 255, 0.65);
+        }
+
+        .code-tab.active {
+            background: white;
+            color: var(--mac-maroon);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.07);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        pre {
+            margin: 0;
+        }
+
+        pre code.hljs {
+            padding: 24px !important;
+            font-size: 0.96rem;
+            line-height: 1.65;
+        }
+
+        .flow-node {
+            min-width: 145px;
+            background: white;
+            border: 2px solid var(--lab-text);
+            color: var(--lab-text);
+            font-weight: 600;
+            font-size: 0.82rem;
+            padding: 10px 14px;
+            border-radius: 9px;
+            text-align: center;
+        }
+
+        .flow-arrow {
+            flex: 1;
+            min-width: 36px;
+            height: 2px;
+            background: #CBD5E1;
+            position: relative;
+            margin: 0 8px;
+        }
+
+        .flow-arrow::after {
+            content: "";
+            position: absolute;
+            right: 0;
+            top: -4px;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+            border-left: 7px solid #CBD5E1;
+        }
+
+        .checkpoint-marker {
+            position: absolute;
+            left: -17px;
+            top: 0;
+            display: flex;
+            width: 32px;
+            height: 32px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            color: white;
+            background: var(--mac-maroon);
+            font-size: 0.84rem;
+            font-weight: 700;
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.18);
+            border: 4px solid white;
+        }
+
+        .stage-footer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 20px;
+            border-top: 1px solid #E5E7EB;
+        }
+
+        .nav-button {
+            padding: 0.72rem 1rem;
+            border-radius: 9px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            transition: all 0.2s ease;
+        }
+
+        .nav-button.secondary {
+            background: white;
+            color: var(--mac-grey);
+            border: 1px solid var(--mac-grey-40);
+        }
+
+        .nav-button.secondary:hover {
+            background: var(--mac-grey-20);
+        }
+
+        .nav-button.primary {
+            background: var(--mac-maroon);
+            color: white;
+            border: 1px solid var(--mac-maroon);
+        }
+
+        .nav-button.primary:hover {
+            background: var(--mac-maroon-80);
+        }
+
+        .completion-box {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.7rem;
+            padding: 0.9rem 1rem;
+            border-radius: 10px;
+            border: 1px solid #DDE3E8;
+            background: white;
+        }
+
+        .completion-box input {
+            margin-top: 0.2rem;
+            accent-color: var(--mac-maroon);
+            width: 18px;
+            height: 18px;
+        }
+
+        .metric-table input,
+        .response-input {
+            width: 100%;
+            padding: 0.55rem 0.65rem;
+            border: 1px solid #CBD5E1;
+            border-radius: 7px;
+            background: white;
+            font-size: 0.9rem;
+        }
+
+        .metric-table input:focus,
+        .response-input:focus {
+            outline: 3px solid var(--mac-maroon-20);
+            border-color: var(--mac-maroon);
+        }
+
+        .stage-summary-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.42rem 0.7rem;
+            border-radius: 999px;
+            background: var(--mac-gold-20);
+            color: #5B3900;
+            border: 1px solid var(--mac-gold-60);
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 900px) {
+            .flow-arrow {
+                width: 2px;
+                height: 28px;
+                min-width: 2px;
+                margin: 6px 0;
+            }
+
+            .flow-arrow::after {
+                right: -4px;
+                top: auto;
+                bottom: -1px;
+                transform: rotate(90deg);
+            }
+        }
+    </style>
+</head>
+
+<body class="pb-24 pt-24 stage-0">
+
+    <!-- ================= LAB STAGE NAVIGATOR ================= -->
+    <nav class="stage-bar" aria-label="Lab progress">
+        <div class="stage-bar-inner">
+            <span class="stage-label">Lab Progress</span>
+
+            <button class="stage-btn active" id="btn-stage-0" onclick="setStage(0)">
+                Setup
+            </button>
+            <button class="stage-btn" id="btn-stage-1" onclick="setStage(1)">
+                Open Loop
+            </button>
+            <button class="stage-btn" id="btn-stage-2" onclick="setStage(2)">
+                P Control
+            </button>
+            <button class="stage-btn" id="btn-stage-3" onclick="setStage(3)">
+                PI Control
+            </button>
+            <button class="stage-btn" id="btn-stage-4" onclick="setStage(4)">
+                PID Control
+            </button>
+            <button class="stage-btn" id="btn-stage-5" onclick="setStage(5)">
+                Delay & Analysis
+            </button>
+        </div>
+    </nav>
+
+    <!-- ================= HARDWARE SIDEBAR ================= -->
+    <aside id="hardwareSidebar" class="sidebar" aria-label="Hardware and safety reference">
+        <div id="handle-hw" class="sidebar-handle" onclick="toggleSidebar('hardwareSidebar')"
+            title="Open hardware reference">
+            <svg class="handle-icon w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </div>
+
+        <div class="p-6 bg-[#7A003C] text-white shadow-md">
+            <h3 class="font-bold text-xl tracking-wide">Hardware & Safety</h3>
+            <p class="text-sm text-white/75 mt-1">REV NEO + SPARK MAX reference</p>
+        </div>
+
+        <div class="p-5 space-y-5 overflow-y-auto">
+
+            <div class="card p-5">
+                <h4 class="font-bold text-[#7A003C] uppercase text-sm mb-4">System Architecture</h4>
+                <div class="space-y-2 text-center text-sm">
+                    <div class="rounded-lg border border-gray-200 bg-gray-50 p-3 font-semibold">MATLAB</div>
+                    <div class="text-gray-400">↓ USB / Python bridge</div>
+                    <div class="rounded-lg border border-gray-200 bg-gray-50 p-3 font-semibold">USB-to-CAN Adapter</div>
+                    <div class="text-gray-400">↓ CAN bus</div>
+                    <div class="rounded-lg border border-gray-200 bg-gray-50 p-3 font-semibold">REV SPARK MAX</div>
+                    <div class="text-gray-400">↓ Motor phases + encoder feedback</div>
+                    <div class="rounded-lg border border-gray-200 bg-gray-50 p-3 font-semibold">REV NEO Motor</div>
+                </div>
+            </div>
+
+            <div class="card p-5 border-l-4 border-[#FDBF57]">
+                <h4 class="font-bold text-gray-700 uppercase text-sm mb-3">Lab Limits</h4>
+                <dl class="grid grid-cols-2 gap-y-3 text-sm">
+                    <dt class="text-gray-500">Current limit</dt>
+                    <dd class="font-semibold text-right">15 A</dd>
+                    <dt class="text-gray-500">Duty-cycle limit</dt>
+                    <dd class="font-semibold text-right">±0.25</dd>
+                    <dt class="text-gray-500">Reference limit</dt>
+                    <dd class="font-semibold text-right">1500 RPM</dd>
+                    <dt class="text-gray-500">Overspeed stop</dt>
+                    <dd class="font-semibold text-right">2500 RPM</dd>
+                    <dt class="text-gray-500">Telemetry timeout</dt>
+                    <dd class="font-semibold text-right">0.10 s</dd>
+                </dl>
+            </div>
+
+            <div class="danger-card text-sm">
+                <h4 class="font-bold uppercase mb-2">Emergency Procedure</h4>
+                <ol class="list-decimal ml-5 space-y-1.5">
+                    <li>Use the physical power disconnect.</li>
+                    <li>Do not touch the rotating shaft.</li>
+                    <li>Stop MATLAB execution.</li>
+                    <li>Notify the instructor or TA.</li>
+                    <li>Do not restore power until authorized.</li>
+                </ol>
+            </div>
+
+            <div class="card p-5">
+                <h4 class="font-bold text-gray-700 uppercase text-sm mb-3">Sign Convention</h4>
+                <div class="text-sm space-y-3">
+                    <p><strong>Positive duty cycle</strong> should produce positive measured velocity.</p>
+                    <p><strong>Negative feedback requires matching signs.</strong></p>
+                    <div class="rounded-lg bg-[#E4CCDA] p-3 text-[#7A003C] font-semibold">
+                        Confirm the sign before closing the loop.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ================= SOFTWARE SIDEBAR ================= -->
+    <aside id="softwareSidebar" class="sidebar" aria-label="MATLAB command reference">
+        <div id="handle-sw" class="sidebar-handle" onclick="toggleSidebar('softwareSidebar')"
+            title="Open MATLAB reference">
+            <svg class="handle-icon w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+            </svg>
+        </div>
+
+        <div class="p-6 bg-[#7A003C] text-white shadow-md">
+            <h3 class="font-bold text-xl tracking-wide">MATLAB Reference</h3>
+            <p class="text-sm text-white/75 mt-1">Commands used in this laboratory</p>
+        </div>
+
+        <div class="p-5 space-y-5 overflow-y-auto">
+            <div class="card overflow-hidden">
+                <div class="px-4 py-3 bg-gray-100 border-b font-bold text-sm">Connection</div>
+                <pre><code class="language-matlab">motor = SparkMaxMatlab( ...
+    PORT, DEVICE_ID, PROJECT_ROOT);
+
+motor.setCurrentLimit(15);</code></pre>
+            </div>
+
+            <div class="card overflow-hidden">
+                <div class="px-4 py-3 bg-gray-100 border-b font-bold text-sm">Telemetry</div>
+                <pre><code class="language-matlab">motor.startTelemetryStream();
+
+sample = motor.getLatestTelemetry();
+
+motor.stopTelemetryStream();</code></pre>
+            </div>
+
+            <div class="card overflow-hidden">
+                <div class="px-4 py-3 bg-gray-100 border-b font-bold text-sm">Control</div>
+                <pre><code class="language-matlab">motor.setDutyCycle(u);
+
+motor.stop();</code></pre>
+            </div>
+
+            <div class="warning-card text-sm">
+                <h4 class="font-bold uppercase mb-2">Do Not Use</h4>
+                <p class="mb-2"><code>motor.setVelocity(...)</code></p>
+                <p>
+                    This would use the SPARK MAX internal speed controller.
+                    The goal here is to implement the controller in MATLAB.
+                </p>
+            </div>
+
+            <div class="card p-5">
+                <h4 class="font-bold text-gray-700 uppercase text-sm mb-3">Telemetry Fields</h4>
+                <div class="grid grid-cols-1 gap-2 text-sm font-mono">
+                    <span>sample.t</span>
+                    <span>sample.velocity</span>
+                    <span>sample.position</span>
+                    <span>sample.applied_output</span>
+                    <span>sample.output_current</span>
+                    <span>sample.bus_voltage</span>
+                    <span>sample.age_s</span>
+                    <span>sample.sample_index</span>
+                </div>
+            </div>
+
+            <div class="card p-5">
+                <h4 class="font-bold text-gray-700 uppercase text-sm mb-3">Common Problems</h4>
+                <ul class="list-disc ml-5 text-sm space-y-2 text-gray-600">
+                    <li>No telemetry: check power, COM port, CAN wiring, and device ID.</li>
+                    <li>Velocity has the wrong sign: stop and correct the sign convention.</li>
+                    <li>Command saturates: lower the gain or reference.</li>
+                    <li>Telemetry age rises: stop the experiment and inspect communication.</li>
+                </ul>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ================= HEADER ================= -->
+    <header class="max-w-6xl mx-auto px-6 lg:px-8 mb-10">
+        <div class="flex flex-col md:flex-row md:items-center gap-7 border-b border-gray-200 pb-8">
+            <img src="Assets/McMaster-logo.png"
+                alt="McMaster University logo"
+                class="h-20 w-auto object-contain"
+                onerror="this.style.display='none'">
+
+            <div class="hidden md:block h-16 w-px bg-gray-200"></div>
+
+            <div>
+                <p class="text-xs font-bold uppercase tracking-[0.18em] text-[#7A003C] mb-2">
+                    Control Systems Laboratory · Week 8
+                </p>
+                <h1 class="text-4xl lg:text-5xl font-extrabold tracking-tight text-[#2D3338] mb-2">
+                    PID Speed Control of a <span class="gradient-text">REV NEO Motor</span>
+                </h1>
+                <p class="text-[#495965] text-lg lg:text-xl font-light max-w-4xl">
+                    Implement proportional, integral, and derivative control in MATLAB,
+                    then test the controller on a physical motor system.
+                </p>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap gap-2 mt-5">
+            <span class="stage-summary-chip">Platform: MATLAB + Python + CAN</span>
+            <span class="stage-summary-chip">Motor: REV NEO</span>
+            <span class="stage-summary-chip">Controller output: duty cycle</span>
+            <span class="stage-summary-chip">Estimated duration: 2 hours</span>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-6 lg:px-8">
+
+        <!-- ========================================================= -->
+        <!-- STAGE 0: SETUP                                            -->
+        <!-- ========================================================= -->
+        <section class="stage-panel stage-0 space-y-8">
+
+            <div class="card p-7 border-l-4 border-[#7A003C]">
+                <div class="flex flex-col lg:flex-row lg:justify-between gap-6">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-[0.16em] text-[#7A003C] mb-2">
+                            Before Checkpoint 1
+                        </p>
+                        <h2 class="text-3xl font-bold mb-3">Lab Overview and Readiness</h2>
+                        <p class="text-gray-600 leading-relaxed max-w-3xl">
+                            In this lab, MATLAB performs the controller calculation.
+                            The SPARK MAX is used as the motor power stage, encoder interface,
+                            and safety/watchdog device.
+                        </p>
+                    </div>
+
+                    <div class="rounded-xl bg-[#FFF2DD] border border-[#FED999] px-5 py-4 h-fit">
+                        <p class="text-xs font-bold uppercase tracking-widest text-[#7A003C]">Deliverables</p>
+                        <p class="text-sm text-[#5B3900] mt-2">
+                            MATLAB file, plots, data files, comparison table, and exit questions.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-6">
+                <div class="card p-7">
+                    <h3 class="text-xl font-bold mb-4">Learning Outcomes</h3>
+                    <ol class="list-decimal ml-5 space-y-3 text-gray-600">
+                        <li>Implement P, PI, and PID speed control in MATLAB.</li>
+                        <li>Measure rise time, overshoot, and steady-state error.</li>
+                        <li>Recognize saturation and integral windup.</li>
+                        <li>Apply basic anti-windup and derivative filtering.</li>
+                        <li>Relate sample timing and delay to stability.</li>
+                    </ol>
+                </div>
+
+                <div class="card p-7">
+                    <h3 class="text-xl font-bold mb-4">Files Required</h3>
+                    <ul class="space-y-3 text-gray-600">
+                        <li><code>matlab/SparkMaxMatlab.m</code></li>
+                        <li><code>matlab/week8_pid_speed_control_starter.m</code></li>
+                        <li><code>src/sparkmax/controller.py</code></li>
+                    </ul>
+
+                    <a href="week8_pid_speed_control_starter.m" download
+                        class="inline-flex mt-6 items-center gap-2 rounded-lg bg-[#7A003C] px-4 py-3 text-white font-semibold hover:bg-[#953360]">
+                        Download MATLAB starter file
+                    </a>
+                </div>
+            </div>
+
+            <div class="card p-7">
+                <h3 class="text-xl font-bold mb-4">Control Architecture</h3>
+
+                <div class="flex flex-col lg:flex-row items-center justify-center gap-2">
+                    <div class="flow-node border-[#7A003C] text-[#7A003C]">
+                        REFERENCE<br>
+                        <span class="text-[11px] font-normal text-gray-500">Desired speed</span>
+                    </div>
+                    <div class="flow-arrow"></div>
+                    <div class="flow-node">
+                        MATLAB PID<br>
+                        <span class="text-[11px] font-normal text-gray-500">Student code</span>
+                    </div>
+                    <div class="flow-arrow"></div>
+                    <div class="flow-node border-[#FDBF57] text-[#7A003C]">
+                        DUTY CYCLE<br>
+                        <span class="text-[11px] font-normal text-gray-500">Actuator command</span>
+                    </div>
+                    <div class="flow-arrow"></div>
+                    <div class="flow-node">
+                        NEO MOTOR<br>
+                        <span class="text-[11px] font-normal text-gray-500">Physical plant</span>
+                    </div>
+                    <div class="flow-arrow"></div>
+                    <div class="flow-node border-[#495965]">
+                        ENCODER<br>
+                        <span class="text-[11px] font-normal text-gray-500">Measured speed</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-6">
+                <div class="danger-card">
+                    <h3 class="text-lg font-bold mb-3">Safety Check</h3>
+                    <div class="space-y-3">
+                        <label class="completion-box">
+                            <input type="checkbox" class="persist-check" data-key="setup-mount">
+                            <span>Motor and load are securely mounted.</span>
+                        </label>
+                        <label class="completion-box">
+                            <input type="checkbox" class="persist-check" data-key="setup-guard">
+                            <span>Shaft guard and emergency disconnect are accessible.</span>
+                        </label>
+                        <label class="completion-box">
+                            <input type="checkbox" class="persist-check" data-key="setup-clear">
+                            <span>Loose objects, clothing, and cables are clear of the shaft.</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="card p-7">
+                    <h3 class="text-lg font-bold mb-3">Pre-Lab Knowledge Check</h3>
+                    <div class="space-y-4 text-sm">
+                        <label class="block">
+                            <span class="font-semibold">Why must the duty-cycle command be limited?</span>
+                            <textarea class="response-input persist-text mt-2" rows="2"
+                                data-key="setup-q1"
+                                placeholder="Write a brief answer..."></textarea>
+                        </label>
+
+                        <label class="block">
+                            <span class="font-semibold">Why is <code>setVelocity()</code> not used?</span>
+                            <textarea class="response-input persist-text mt-2" rows="2"
+                                data-key="setup-q2"
+                                placeholder="Write a brief answer..."></textarea>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stage-footer">
+                <span></span>
+                <button class="nav-button primary" onclick="completeAndGo(0, 1)">
+                    Mark Setup Complete and Continue
+                </button>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- STAGE 1: OPEN LOOP                                        -->
+        <!-- ========================================================= -->
+        <section class="stage-panel stage-1">
+
+            <div class="relative pl-8 border-l-2 border-gray-200">
+                <span class="checkpoint-marker">1</span>
+
+                <div class="card p-7">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                        <div>
+                            <p class="text-xs font-bold uppercase tracking-widest text-[#7A003C] mb-1">
+                                Checkpoint 1
+                            </p>
+                            <h2 class="text-3xl font-bold">Meet the Plant</h2>
+                        </div>
+                        <span class="time-badge">Time: 15 min</span>
+                    </div>
+
+                    <div class="border border-gray-200 rounded-xl overflow-hidden">
+                        <div class="code-header">
+                            <button class="code-tab active" data-tabs="openloop" data-target="openloop-concept"
+                                onclick="switchTab(this)">
+                                Concept
+                            </button>
+                            <button class="code-tab" data-tabs="openloop" data-target="openloop-code"
+                                onclick="switchTab(this)">
+                                MATLAB Task
+                            </button>
+                            <button class="code-tab" data-tabs="openloop" data-target="openloop-experiment"
+                                onclick="switchTab(this)">
+                                Experiment
+                            </button>
+                            <button class="code-tab" data-tabs="openloop" data-target="openloop-analysis"
+                                onclick="switchTab(this)">
+                                Analysis
+                            </button>
+                        </div>
+
+                        <div id="openloop-concept" class="tab-content active p-6">
+                            <div class="grid lg:grid-cols-3 gap-5">
+                                <div class="lg:col-span-1 card p-5 bg-gray-50">
+                                    <h4 class="font-bold uppercase text-sm text-gray-600 mb-3">Input</h4>
+                                    <p class="text-3xl font-bold text-[#7A003C]">Duty Cycle</p>
+                                    <p class="text-sm text-gray-500 mt-2">A normalized command from −1 to +1.</p>
+                                </div>
+
+                                <div class="lg:col-span-2 briefing-card">
+                                    <h4 class="font-bold text-[#7A003C] uppercase text-sm mb-3">Objective</h4>
+                                    <p class="text-gray-600 leading-relaxed">
+                                        Observe how the motor responds without feedback. A fixed duty cycle supplies
+                                        a fixed fraction of available voltage, but it does not guarantee a fixed speed.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="openloop-code" class="tab-content">
+                            <pre><code class="language-matlab">% In week8_pid_speed_control_starter.m,
+% under "2. EXPERIMENT SELECTION", set:
+
+EXPERIMENT_MODE = "OPEN_LOOP";</code></pre>
+                        </div>
+
+                        <div id="openloop-experiment" class="tab-content p-6">
+                            <div class="grid lg:grid-cols-2 gap-5">
+                                <div class="card p-5">
+                                    <h4 class="font-bold mb-3">Run Sequence</h4>
+                                    <ol class="list-decimal ml-5 space-y-2 text-gray-600">
+                                        <li>Confirm bus voltage and telemetry.</li>
+                                        <li>Run the starter file.</li>
+                                        <li>Observe the 0.12 duty-cycle step.</li>
+                                        <li>Confirm positive command gives positive speed.</li>
+                                        <li>Save the generated plot and data files.</li>
+                                    </ol>
+                                </div>
+
+                                <div class="warning-card">
+                                    <h4 class="font-bold mb-2">Stop Immediately If</h4>
+                                    <ul class="list-disc ml-5 space-y-1.5">
+                                        <li>Speed sign is reversed.</li>
+                                        <li>The shaft or load is loose.</li>
+                                        <li>Telemetry age exceeds the safety limit.</li>
+                                        <li>Unexpected vibration or noise occurs.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="openloop-analysis" class="tab-content p-6">
+                            <div class="grid md:grid-cols-3 gap-4">
+                                <label class="block">
+                                    <span class="font-semibold text-sm">Steady speed (RPM)</span>
+                                    <input type="number" class="response-input persist-text mt-2"
+                                        data-key="openloop-speed" placeholder="e.g. 620">
+                                </label>
+
+                                <label class="block">
+                                    <span class="font-semibold text-sm">Approx. rise time (s)</span>
+                                    <input type="number" step="0.01" class="response-input persist-text mt-2"
+                                        data-key="openloop-rise" placeholder="e.g. 0.45">
+                                </label>
+
+                                <label class="block">
+                                    <span class="font-semibold text-sm">Direction correct?</span>
+                                    <select class="response-input persist-text mt-2" data-key="openloop-sign">
+                                        <option value="">Choose...</option>
+                                        <option>Yes</option>
+                                        <option>No</option>
+                                    </select>
+                                </label>
+                            </div>
+
+                            <label class="block mt-5">
+                                <span class="font-semibold text-sm">
+                                    Why does a fixed duty cycle not guarantee a fixed speed?
+                                </span>
+                                <textarea class="response-input persist-text mt-2" rows="3"
+                                    data-key="openloop-explain"></textarea>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="stage-footer">
+                        <button class="nav-button secondary" onclick="setStage(0)">Back to Setup</button>
+                        <button class="nav-button primary" onclick="completeAndGo(1, 2)">
+                            Complete Checkpoint 1
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- STAGE 2: P CONTROL                                        -->
+        <!-- ========================================================= -->
+        <section class="stage-panel stage-2">
+
+            <div class="relative pl-8 border-l-2 border-gray-200">
+                <span class="checkpoint-marker">2</span>
+
+                <div class="card p-7">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                        <div>
+                            <p class="text-xs font-bold uppercase tracking-widest text-[#7A003C] mb-1">
+                                Checkpoint 2
+                            </p>
+                            <h2 class="text-3xl font-bold">Proportional Speed Control</h2>
+                        </div>
+                        <span class="time-badge">Time: 25 min</span>
+                    </div>
+
+                    <div class="border border-gray-200 rounded-xl overflow-hidden">
+                        <div class="code-header">
+                            <button class="code-tab active" data-tabs="pcontrol" data-target="p-concept"
+                                onclick="switchTab(this)">Concept</button>
+                            <button class="code-tab" data-tabs="pcontrol" data-target="p-code"
+                                onclick="switchTab(this)">MATLAB Task</button>
+                            <button class="code-tab" data-tabs="pcontrol" data-target="p-trials"
+                                onclick="switchTab(this)">Gain Trials</button>
+                            <button class="code-tab" data-tabs="pcontrol" data-target="p-analysis"
+                                onclick="switchTab(this)">Analysis</button>
+                        </div>
+
+                        <div id="p-concept" class="tab-content active p-6">
+                            <div class="briefing-card">
+                                <h4 class="font-bold text-[#7A003C] uppercase text-sm mb-3">Control Logic</h4>
+                                <p class="text-gray-600 mb-4">
+                                    The controller compares desired speed with measured speed.
+                                    Proportional action creates a control effort that grows with the error.
+                                </p>
+                                <div class="rounded-lg bg-white border border-gray-200 p-4 font-mono text-sm">
+                                    error = reference − measured velocity<br>
+                                    P = Kp × error
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="p-code" class="tab-content">
+                            <pre><code class="language-matlab">% In week8_pid_speed_control_starter.m,
+% under "TODO STUDENT 1 — PROPORTIONAL ACTION":
+
+P = Kp * controlError;
+
+% Under "TODO STUDENT 4 — COMPLETE THE CONTROLLER EQUATION":
+
+controlUnsaturated = P;</code></pre>
+                        </div>
+
+                        <div id="p-trials" class="tab-content p-6">
+                            <p class="text-gray-600 mb-5">
+                                Use three instructor-approved values of <code>Kp</code>.
+                                Keep all other settings unchanged.
+                            </p>
+
+                            <div class="overflow-x-auto">
+                                <table class="metric-table w-full text-sm border-collapse">
+                                    <thead>
+                                        <tr class="bg-gray-100">
+                                            <th class="p-3 text-left border">Trial</th>
+                                            <th class="p-3 text-left border">Kp</th>
+                                            <th class="p-3 text-left border">Rise time (s)</th>
+                                            <th class="p-3 text-left border">Overshoot (%)</th>
+                                            <th class="p-3 text-left border">Steady-state error (RPM)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="p-3 border font-semibold">Low</td>
+                                            <td class="p-2 border"><input class="persist-text" data-key="p-low-kp"></td>
+                                            <td class="p-2 border"><input class="persist-text" data-key="p-low-rise"></td>
+                                            <td class="p-2 border"><input class="persist-text" data-key="p-low-over"></td>
+                                            <td class="p-2 border"><input class="persist-text" data-key="p-low-sse"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="p-3 border font-semibold">Moderate</td>
+                                            <td class="p-2 border"><input class="persist-text" data-key="p-med-kp"></td>
+                                            <td class="p-2 border"><input class="persist-text" data-key="p-med-rise"></td>
+                                            <td class="p-2 border"><input class="persist-text" data-key="p-med-over"></td>
+                                            <td class="p-2 border"><input class="persist-text" data-key="p-med-sse"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="p-3 border font-semibold">High</td>
+                                            <td class="p-2 border"><input class="persist-text" data-key="p-high-kp"></td>
+                                            <td class="p-2 border"><input class="persist-text" data-key="p-high-rise"></td>
+                                            <td class="p-2 border"><input class="persist-text" data-key="p-high-over"></td>
+                                            <td class="p-2 border"><input class="persist-text" data-key="p-high-sse"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="p-analysis" class="tab-content p-6">
+                            <label class="block">
+                                <span class="font-semibold text-sm">
+                                    Why does proportional control commonly leave steady-state error?
+                                </span>
+                                <textarea class="response-input persist-text mt-2" rows="4"
+                                    data-key="p-analysis"></textarea>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="stage-footer">
+                        <button class="nav-button secondary" onclick="setStage(1)">Back to Open Loop</button>
+                        <button class="nav-button primary" onclick="completeAndGo(2, 3)">
+                            Complete Checkpoint 2
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- STAGE 3: PI CONTROL                                       -->
+        <!-- ========================================================= -->
+        <section class="stage-panel stage-3">
+
+            <div class="relative pl-8 border-l-2 border-gray-200">
+                <span class="checkpoint-marker">3</span>
+
+                <div class="card p-7">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                        <div>
+                            <p class="text-xs font-bold uppercase tracking-widest text-[#7A003C] mb-1">
+                                Checkpoint 3
+                            </p>
+                            <h2 class="text-3xl font-bold">Integral Action and Anti-Windup</h2>
+                        </div>
+                        <span class="time-badge">Time: 25 min</span>
+                    </div>
+
+                    <div class="border border-gray-200 rounded-xl overflow-hidden">
+                        <div class="code-header">
+                            <button class="code-tab active" data-tabs="picontrol" data-target="pi-concept"
+                                onclick="switchTab(this)">Concept</button>
+                            <button class="code-tab" data-tabs="picontrol" data-target="pi-code"
+                                onclick="switchTab(this)">MATLAB Task</button>
+                            <button class="code-tab" data-tabs="picontrol" data-target="pi-windup"
+                                onclick="switchTab(this)">Windup</button>
+                            <button class="code-tab" data-tabs="picontrol" data-target="pi-analysis"
+                                onclick="switchTab(this)">Analysis</button>
+                        </div>
+
+                        <div id="pi-concept" class="tab-content active p-6">
+                            <div class="grid lg:grid-cols-2 gap-5">
+                                <div class="briefing-card">
+                                    <h4 class="font-bold text-[#7A003C] uppercase text-sm mb-3">Integral Action</h4>
+                                    <p class="text-gray-600">
+                                        Integral action accumulates error over time. Persistent error therefore
+                                        produces an increasing corrective action.
+                                    </p>
+                                </div>
+
+                                <div class="warning-card">
+                                    <h4 class="font-bold uppercase text-sm mb-3">Windup</h4>
+                                    <p>
+                                        If the actuator is saturated while error continues to accumulate,
+                                        the integral state can become excessively large and delay recovery.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="pi-code" class="tab-content">
+                            <pre><code class="language-matlab">% Under "TODO STUDENT 3 — CANDIDATE INTEGRAL STATE":
+
+candidateIntegral = integralState + controlError * dt;
+candidateIntegral = clamp( ...
+    candidateIntegral, -INTEGRAL_LIMIT, INTEGRAL_LIMIT);
+
+% Under case "PI":
+
+I = Ki * candidateIntegral;
+D = 0.0;
+
+% Under "TODO STUDENT 4":
+
+controlUnsaturated = P + I;</code></pre>
+                        </div>
+
+                        <div id="pi-windup" class="tab-content p-6">
+                            <p class="text-gray-600 mb-4">
+                                Add anti-windup under:
+                                <code>TODO STUDENT 5 — BASIC ANTI-WINDUP</code>
+                            </p>
+
+                            <pre><code class="language-matlab">% One acceptable strategy:
+% integrate when the output is not saturated,
+% or when the error would drive the command back toward the valid range.
+
+notSaturated = abs(controlUnsaturated) <= MAX_DUTY;
+
+drivesBackFromUpperLimit = ...
+    controlUnsaturated > MAX_DUTY && controlError < 0;
+
+drivesBackFromLowerLimit = ...
+    controlUnsaturated < -MAX_DUTY && controlError > 0;
+
+if notSaturated || drivesBackFromUpperLimit || drivesBackFromLowerLimit
+    integralState = candidateIntegral;
+end</code></pre>
+                        </div>
+
+                        <div id="pi-analysis" class="tab-content p-6">
+                            <div class="overflow-x-auto mb-5">
+                                <table class="metric-table w-full text-sm border-collapse">
+                                    <thead>
+                                        <tr class="bg-gray-100">
+                                            <th class="p-3 text-left border">Controller</th>
+                                            <th class="p-3 text-left border">Steady-state error</th>
+                                            <th class="p-3 text-left border">Overshoot</th>
+                                            <th class="p-3 text-left border">Settling time</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="p-3 border font-semibold">P</td>
+                                            <td class="p-2 border"><input class="persist-text" data-key="pi-p-sse"></td>
+                                            <td class="p-2 border"><input class="persist-text" data-key="pi-p-over"></td>
+                                            <td class="p-2 border"><input class="persist-text" data-key="pi-p-settle"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="p-3 border font-semibold">PI</td>
+                                            <td class="p-2 border"><input class="persist-text" data-key="pi-pi-sse"></td>
+                                            <td class="p-2 border"><input class="persist-text" data-key="pi-pi-over"></td>
+                                            <td class="p-2 border"><input class="persist-text" data-key="pi-pi-settle"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <label class="block">
+                                <span class="font-semibold text-sm">
+                                    How did anti-windup change the response after saturation?
+                                </span>
+                                <textarea class="response-input persist-text mt-2" rows="3"
+                                    data-key="pi-explain"></textarea>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="stage-footer">
+                        <button class="nav-button secondary" onclick="setStage(2)">Back to P Control</button>
+                        <button class="nav-button primary" onclick="completeAndGo(3, 4)">
+                            Complete Checkpoint 3
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- STAGE 4: PID CONTROL                                      -->
+        <!-- ========================================================= -->
+        <section class="stage-panel stage-4">
+
+            <div class="relative pl-8 border-l-2 border-gray-200">
+                <span class="checkpoint-marker">4</span>
+
+                <div class="card p-7">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                        <div>
+                            <p class="text-xs font-bold uppercase tracking-widest text-[#7A003C] mb-1">
+                                Checkpoint 4
+                            </p>
+                            <h2 class="text-3xl font-bold">Derivative Action and Filtering</h2>
+                        </div>
+                        <span class="time-badge">Time: 20 min</span>
+                    </div>
+
+                    <div class="border border-gray-200 rounded-xl overflow-hidden">
+                        <div class="code-header">
+                            <button class="code-tab active" data-tabs="pidcontrol" data-target="pid-concept"
+                                onclick="switchTab(this)">Concept</button>
+                            <button class="code-tab" data-tabs="pidcontrol" data-target="pid-code"
+                                onclick="switchTab(this)">MATLAB Task</button>
+                            <button class="code-tab" data-tabs="pidcontrol" data-target="pid-filter"
+                                onclick="switchTab(this)">Filtering</button>
+                            <button class="code-tab" data-tabs="pidcontrol" data-target="pid-analysis"
+                                onclick="switchTab(this)">Analysis</button>
+                        </div>
+
+                        <div id="pid-concept" class="tab-content active p-6">
+                            <div class="briefing-card">
+                                <h4 class="font-bold text-[#7A003C] uppercase text-sm mb-3">Derivative Action</h4>
+                                <p class="text-gray-600">
+                                    Derivative action responds to how quickly the measured speed is changing.
+                                    It can improve damping, but it also magnifies measurement noise.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div id="pid-code" class="tab-content">
+                            <pre><code class="language-matlab">% Under "TODO STUDENT 2 — DERIVATIVE OF THE MEASURED SPEED":
+
+rawMeasurementDerivative = ...
+    (measuredVelocity - previousVelocity) / dt;
+
+filteredMeasurementDerivative = ...
+    DERIVATIVE_FILTER_ALPHA * rawMeasurementDerivative + ...
+    (1 - DERIVATIVE_FILTER_ALPHA) * ...
+    filteredMeasurementDerivative;
+
+D = -Kd * filteredMeasurementDerivative;
+
+% Under case {"PID", "PID_DELAY"}:
+
+I = Ki * candidateIntegral;
+
+% Under "TODO STUDENT 4":
+
+controlUnsaturated = P + I + D;</code></pre>
+                        </div>
+
+                        <div id="pid-filter" class="tab-content p-6">
+                            <div class="grid lg:grid-cols-2 gap-5">
+                                <div class="card p-5 bg-gray-50">
+                                    <h4 class="font-bold mb-3">Lower α</h4>
+                                    <p class="text-gray-600 text-sm">
+                                        More smoothing, less noise, but slower derivative response.
+                                    </p>
+                                </div>
+
+                                <div class="card p-5 bg-gray-50">
+                                    <h4 class="font-bold mb-3">Higher α</h4>
+                                    <p class="text-gray-600 text-sm">
+                                        Faster derivative response, but more sensitivity to noise.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="pid-analysis" class="tab-content p-6">
+                            <label class="block mb-5">
+                                <span class="font-semibold text-sm">
+                                    Did derivative action reduce overshoot or settling time?
+                                </span>
+                                <textarea class="response-input persist-text mt-2" rows="3"
+                                    data-key="pid-benefit"></textarea>
+                            </label>
+
+                            <label class="block">
+                                <span class="font-semibold text-sm">
+                                    How did the derivative filter affect the duty-cycle signal?
+                                </span>
+                                <textarea class="response-input persist-text mt-2" rows="3"
+                                    data-key="pid-filter-answer"></textarea>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="stage-footer">
+                        <button class="nav-button secondary" onclick="setStage(3)">Back to PI Control</button>
+                        <button class="nav-button primary" onclick="completeAndGo(4, 5)">
+                            Complete Checkpoint 4
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- STAGE 5: DELAY & ANALYSIS                                 -->
+        <!-- ========================================================= -->
+        <section class="stage-panel stage-5 space-y-8">
+
+            <div class="card overflow-hidden shadow-2xl">
+                <div class="gradient-bg p-8 text-white">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
+                        <div>
+                            <p class="text-xs font-bold uppercase tracking-[0.18em] text-white/75 mb-2">
+                                Checkpoint 5
+                            </p>
+                            <h2 class="text-4xl font-extrabold uppercase tracking-wide">
+                                Delay and the Approach to Instability
+                            </h2>
+                            <p class="mt-2 text-white/80">
+                                Use the same PID gains, then add software delay and observe the change.
+                            </p>
+                        </div>
+
+                        <div class="rounded-xl bg-white/20 border border-white/30 px-5 py-4">
+                            <span class="block text-[10px] font-bold uppercase tracking-widest text-white/70">
+                                Time Budget
+                            </span>
+                            <span class="text-2xl font-bold">15 min</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-7 bg-gray-50 border-b">
+                    <div class="flex flex-col lg:flex-row items-center justify-center gap-2">
+                        <div class="flow-node border-[#7A003C] text-[#7A003C]">READ SPEED</div>
+                        <div class="flow-arrow"></div>
+                        <div class="flow-node">WAIT / DELAY</div>
+                        <div class="flow-arrow"></div>
+                        <div class="flow-node">CALCULATE PID</div>
+                        <div class="flow-arrow"></div>
+                        <div class="flow-node border-[#FDBF57] text-[#7A003C]">APPLY OLD CORRECTION</div>
+                    </div>
+                </div>
+
+                <div class="p-7 grid lg:grid-cols-2 gap-6">
+                    <div class="card overflow-hidden">
+                        <div class="px-4 py-3 bg-gray-100 border-b font-bold text-sm">
+                            Baseline PID
+                        </div>
+                        <pre><code class="language-matlab">EXPERIMENT_MODE = "PID";
+ARTIFICIAL_DELAY_S = 0.00;</code></pre>
+                    </div>
+
+                    <div class="card overflow-hidden">
+                        <div class="px-4 py-3 bg-gray-100 border-b font-bold text-sm">
+                            Delayed PID
+                        </div>
+                        <pre><code class="language-matlab">EXPERIMENT_MODE = "PID_DELAY";
+ARTIFICIAL_DELAY_S = 0.05;</code></pre>
+                    </div>
+                </div>
+
+                <div class="px-7 pb-7">
+                    <div class="warning-card">
+                        Use only instructor-approved delay values. Keep the gains and reference profile unchanged.
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-7">
+                <h3 class="text-2xl font-bold mb-5">Controller Comparison</h3>
+
+                <div class="overflow-x-auto">
+                    <table class="metric-table w-full text-sm border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="p-3 text-left border">Controller</th>
+                                <th class="p-3 text-left border">Rise time</th>
+                                <th class="p-3 text-left border">Overshoot</th>
+                                <th class="p-3 text-left border">Steady-state error</th>
+                                <th class="p-3 text-left border">IAE</th>
+                                <th class="p-3 text-left border">Max duty</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="p-3 border font-semibold">P</td>
+                                <td class="p-2 border"><input class="persist-text" data-key="final-p-rise"></td>
+                                <td class="p-2 border"><input class="persist-text" data-key="final-p-over"></td>
+                                <td class="p-2 border"><input class="persist-text" data-key="final-p-sse"></td>
+                                <td class="p-2 border"><input class="persist-text" data-key="final-p-iae"></td>
+                                <td class="p-2 border"><input class="persist-text" data-key="final-p-duty"></td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 border font-semibold">PI</td>
+                                <td class="p-2 border"><input class="persist-text" data-key="final-pi-rise"></td>
+                                <td class="p-2 border"><input class="persist-text" data-key="final-pi-over"></td>
+                                <td class="p-2 border"><input class="persist-text" data-key="final-pi-sse"></td>
+                                <td class="p-2 border"><input class="persist-text" data-key="final-pi-iae"></td>
+                                <td class="p-2 border"><input class="persist-text" data-key="final-pi-duty"></td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 border font-semibold">PID</td>
+                                <td class="p-2 border"><input class="persist-text" data-key="final-pid-rise"></td>
+                                <td class="p-2 border"><input class="persist-text" data-key="final-pid-over"></td>
+                                <td class="p-2 border"><input class="persist-text" data-key="final-pid-sse"></td>
+                                <td class="p-2 border"><input class="persist-text" data-key="final-pid-iae"></td>
+                                <td class="p-2 border"><input class="persist-text" data-key="final-pid-duty"></td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 border font-semibold">PID + delay</td>
+                                <td class="p-2 border"><input class="persist-text" data-key="final-delay-rise"></td>
+                                <td class="p-2 border"><input class="persist-text" data-key="final-delay-over"></td>
+                                <td class="p-2 border"><input class="persist-text" data-key="final-delay-sse"></td>
+                                <td class="p-2 border"><input class="persist-text" data-key="final-delay-iae"></td>
+                                <td class="p-2 border"><input class="persist-text" data-key="final-delay-duty"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-6">
+                <div class="card p-7">
+                    <h3 class="text-xl font-bold mb-4">Final Recommendation</h3>
+                    <label class="block">
+                        <span class="font-semibold text-sm">
+                            Which controller would you choose for this motor-speed application, and why?
+                        </span>
+                        <textarea class="response-input persist-text mt-2" rows="8"
+                            data-key="final-recommendation"
+                            placeholder="Discuss tracking, overshoot, settling time, control effort, noise, and robustness..."></textarea>
+                    </label>
+                </div>
+
+                <div class="card p-7">
+                    <h3 class="text-xl font-bold mb-4">Submission Checklist</h3>
+                    <div class="space-y-3">
+                        <label class="completion-box">
+                            <input type="checkbox" class="persist-check" data-key="submit-code">
+                            <span>Completed MATLAB starter file</span>
+                        </label>
+                        <label class="completion-box">
+                            <input type="checkbox" class="persist-check" data-key="submit-plots">
+                            <span>Required response and duty-cycle plots</span>
+                        </label>
+                        <label class="completion-box">
+                            <input type="checkbox" class="persist-check" data-key="submit-mat">
+                            <span>Generated <code>.mat</code> results file</span>
+                        </label>
+                        <label class="completion-box">
+                            <input type="checkbox" class="persist-check" data-key="submit-csv">
+                            <span>Generated <code>.csv</code> results file</span>
+                        </label>
+                        <label class="completion-box">
+                            <input type="checkbox" class="persist-check" data-key="submit-table">
+                            <span>Controller comparison table</span>
+                        </label>
+                        <label class="completion-box">
+                            <input type="checkbox" class="persist-check" data-key="submit-recommendation">
+                            <span>Final controller recommendation</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stage-footer">
+                <button class="nav-button secondary" onclick="setStage(4)">Back to PID Control</button>
+                <button class="nav-button primary" onclick="markStageComplete(5)">
+                    Mark Final Analysis Complete
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <footer class="text-center py-12 text-gray-400 text-xs">
+        McMaster University | &copy; 2026 W Booth School of Engineering Practice and Technology
+    </footer>
+
+    <script>
+        hljs.highlightAll();
+
+        const TOTAL_STAGES = 6;
+
+        function setStage(stage) {
+            document.body.className = `pb-24 pt-24 stage-${stage}`;
+
+            document.querySelectorAll('.stage-btn').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            const activeButton = document.getElementById(`btn-stage-${stage}`);
+            if (activeButton) activeButton.classList.add('active');
+
+            localStorage.setItem('week8-current-stage', String(stage));
+
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        function markStageComplete(stage) {
+            localStorage.setItem(`week8-stage-${stage}-complete`, 'true');
+            updateCompletionUI();
+        }
+
+        function completeAndGo(stage, nextStage) {
+            markStageComplete(stage);
+            setStage(nextStage);
+        }
+
+        function updateCompletionUI() {
+            for (let stage = 0; stage < TOTAL_STAGES; stage++) {
+                const button = document.getElementById(`btn-stage-${stage}`);
+                if (!button) continue;
+
+                const complete =
+                    localStorage.getItem(`week8-stage-${stage}-complete`) === 'true';
+
+                button.classList.toggle('completed', complete);
+            }
+        }
+
+        function switchTab(button) {
+            const group = button.dataset.tabs;
+            const targetId = button.dataset.target;
+
+            document.querySelectorAll(`.code-tab[data-tabs="${group}"]`)
+                .forEach(tab => tab.classList.remove('active'));
+
+            document.querySelectorAll(`[id^="${group === 'openloop' ? 'openloop' :
+                group === 'pcontrol' ? 'p-' :
+                group === 'picontrol' ? 'pi-' :
+                group === 'pidcontrol' ? 'pid-' : ''}"]`)
+                .forEach(panel => {
+                    if (panel.classList.contains('tab-content')) {
+                        panel.classList.remove('active');
+                    }
+                });
+
+            button.classList.add('active');
+
+            const target = document.getElementById(targetId);
+            if (target) target.classList.add('active');
+        }
+
+        function toggleSidebar(id) {
+            const selected = document.getElementById(id);
+            const wasOpen = selected.classList.contains('active');
+
+            document.querySelectorAll('.sidebar')
+                .forEach(sidebar => sidebar.classList.remove('active'));
+
+            if (!wasOpen) selected.classList.add('active');
+        }
+
+        function restorePersistentInputs() {
+            document.querySelectorAll('.persist-check').forEach(input => {
+                input.checked = localStorage.getItem(`week8-${input.dataset.key}`) === 'true';
+
+                input.addEventListener('change', () => {
+                    localStorage.setItem(
+                        `week8-${input.dataset.key}`,
+                        input.checked ? 'true' : 'false'
+                    );
+                });
+            });
+
+            document.querySelectorAll('.persist-text').forEach(input => {
+                const saved = localStorage.getItem(`week8-${input.dataset.key}`);
+                if (saved !== null) input.value = saved;
+
+                const eventName =
+                    input.tagName === 'SELECT' ? 'change' : 'input';
+
+                input.addEventListener(eventName, () => {
+                    localStorage.setItem(
+                        `week8-${input.dataset.key}`,
+                        input.value
+                    );
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCompletionUI();
+            restorePersistentInputs();
+
+            const savedStage = Number(
+                localStorage.getItem('week8-current-stage') ?? 0
+            );
+
+            setStage(
+                Number.isInteger(savedStage) &&
+                savedStage >= 0 &&
+                savedStage < TOTAL_STAGES
+                    ? savedStage
+                    : 0
+            );
+        });
+    </script>
+</body>
+</html>
