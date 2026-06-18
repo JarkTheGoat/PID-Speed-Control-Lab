@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>McMaster | PID Speed Control Laboratory</title>
 
-    <link rel="icon" href="Assets/favicon.png" type="image/x-icon">
-
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -485,7 +483,235 @@
             font-weight: 600;
         }
 
+        /* -------------------- AUTO-GRADED KNOWLEDGE CHECKS -------------------- */
+        .auto-score-chip {
+            flex: 0 0 auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            margin-left: auto;
+            padding: 0.5rem 0.75rem;
+            border-radius: 999px;
+            background: var(--mac-gold-20);
+            border: 1px solid var(--mac-gold-60);
+            color: #5B3900;
+            font-size: 0.78rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .quiz-stack {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .quiz-card {
+            min-width: 0;
+            border: 1px solid #DDE3E8;
+            border-left: 5px solid var(--mac-grey-60);
+            border-radius: 12px;
+            background: white;
+            padding: 1rem;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .quiz-card.correct {
+            border-left-color: var(--success);
+            box-shadow: 0 0 0 2px rgba(40, 122, 75, 0.08);
+        }
+
+        .quiz-card.incorrect {
+            border-left-color: var(--danger);
+            box-shadow: 0 0 0 2px rgba(180, 35, 24, 0.06);
+        }
+
+        .quiz-title {
+            display: block;
+            width: 100%;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--lab-text);
+            margin-bottom: 0.75rem;
+        }
+
+        .quiz-points {
+            display: inline-flex;
+            align-items: center;
+            margin-left: 0.4rem;
+            padding: 0.18rem 0.45rem;
+            border-radius: 999px;
+            background: var(--mac-maroon-20);
+            color: var(--mac-maroon);
+            font-size: 0.68rem;
+            font-weight: 700;
+            vertical-align: middle;
+        }
+
+        .quiz-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.65rem;
+            width: 100%;
+            padding: 0.72rem 0.8rem;
+            border: 1px solid #E2E8F0;
+            border-radius: 9px;
+            background: #FAFBFC;
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+
+        .quiz-option + .quiz-option {
+            margin-top: 0.55rem;
+        }
+
+        .quiz-option:hover {
+            background: var(--mac-maroon-20);
+            border-color: var(--mac-maroon-40);
+        }
+
+        .quiz-option input {
+            flex: 0 0 auto;
+            margin-top: 0.18rem;
+            accent-color: var(--mac-maroon);
+            width: 17px;
+            height: 17px;
+        }
+
+        .quiz-option:has(input:disabled) {
+            cursor: default;
+            opacity: 0.82;
+        }
+
+        .quiz-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 0.9rem;
+        }
+
+        .quiz-check-button {
+            padding: 0.6rem 0.85rem;
+            border-radius: 8px;
+            border: 1px solid var(--mac-maroon);
+            background: var(--mac-maroon);
+            color: white;
+            font-size: 0.82rem;
+            font-weight: 700;
+            transition: background 0.2s ease;
+        }
+
+        .quiz-check-button:hover:not(:disabled) {
+            background: var(--mac-maroon-80);
+        }
+
+        .quiz-check-button:disabled {
+            border-color: var(--success);
+            background: var(--success);
+            cursor: default;
+        }
+
+        .attempt-count {
+            font-size: 0.78rem;
+            color: var(--mac-grey-80);
+        }
+
+        .quiz-feedback {
+            display: none;
+            margin-top: 0.85rem;
+            padding: 0.75rem 0.85rem;
+            border-radius: 9px;
+            font-size: 0.85rem;
+            line-height: 1.55;
+        }
+
+        .quiz-feedback.show {
+            display: block;
+        }
+
+        .quiz-feedback.correct {
+            background: #EFFAF3;
+            border: 1px solid #B7E4C7;
+            color: #174D2D;
+        }
+
+        .quiz-feedback.incorrect {
+            background: #FFF3F2;
+            border: 1px solid #FECACA;
+            color: #7A271A;
+        }
+
+        .stage-message {
+            display: none;
+            width: 100%;
+            margin-top: 1rem;
+            padding: 0.85rem 1rem;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 600;
+        }
+
+        .stage-message.show {
+            display: block;
+        }
+
+        .stage-message.error {
+            background: #FFF3F2;
+            border: 1px solid #FECACA;
+            color: #7A271A;
+        }
+
+        .stage-message.success {
+            background: #EFFAF3;
+            border: 1px solid #B7E4C7;
+            color: #174D2D;
+        }
+
+        .grading-breakdown {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.8rem;
+        }
+
+        .grading-breakdown > div {
+            padding: 0.9rem 1rem;
+            border-radius: 10px;
+            background: white;
+            border: 1px solid #E2E8F0;
+        }
+
+        .rubric-list {
+            display: grid;
+            gap: 0.55rem;
+            margin-top: 0.9rem;
+            font-size: 0.83rem;
+            color: #4B5563;
+        }
+
+        .rubric-list li {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            padding-bottom: 0.45rem;
+            border-bottom: 1px solid #EEF1F4;
+        }
+
+        .word-count {
+            margin-top: 0.45rem;
+            text-align: right;
+            font-size: 0.76rem;
+            color: var(--mac-grey-80);
+        }
+
         @media (max-width: 900px) {
+            .auto-score-chip {
+                margin-left: 0;
+            }
+
+            .grading-breakdown {
+                grid-template-columns: 1fr;
+            }
+
             .flow-arrow {
                 width: 2px;
                 height: 28px;
@@ -528,6 +754,10 @@
             <button class="stage-btn" id="btn-stage-5" onclick="setStage(5)">
                 Delay & Analysis
             </button>
+
+            <div class="auto-score-chip" aria-live="polite" title="Auto-graded knowledge-check score">
+                Auto Score <strong id="autoScoreValue">0/10</strong>
+            </div>
         </div>
     </nav>
 
@@ -736,6 +966,26 @@ motor.stop();</code></pre>
                 </div>
             </div>
 
+            <div class="success-card">
+                <h3 class="text-lg font-bold mb-3">How This Lab Is Graded</h3>
+                <div class="grading-breakdown">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-widest text-[#287A4B]">Automatic checks</p>
+                        <p class="text-2xl font-bold mt-1">10 points</p>
+                        <p class="text-sm mt-1">Ten one-point concept checks. Retry until correct.</p>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-widest text-[#7A003C]">Instructor synthesis</p>
+                        <p class="text-2xl font-bold mt-1">20 points</p>
+                        <p class="text-sm mt-1">One evidence-based final recommendation graded with a rubric.</p>
+                    </div>
+                </div>
+                <p class="text-sm mt-4">
+                    A stage unlocks completion only after its knowledge checks are correct and its required
+                    experiment fields are filled. Progress is saved locally in this browser.
+                </p>
+            </div>
+
             <div class="grid lg:grid-cols-2 gap-6">
                 <div class="card p-7">
                     <h3 class="text-xl font-bold mb-4">Learning Outcomes</h3>
@@ -814,21 +1064,43 @@ motor.stop();</code></pre>
                 </div>
 
                 <div class="card p-7">
-                    <h3 class="text-lg font-bold mb-3">Pre-Lab Knowledge Check</h3>
-                    <div class="space-y-4 text-sm">
-                        <label class="block">
-                            <span class="font-semibold">Why must the duty-cycle command be limited?</span>
-                            <textarea class="response-input persist-text mt-2" rows="2"
-                                data-key="setup-q1"
-                                placeholder="Write a brief answer..."></textarea>
-                        </label>
+                    <h3 class="text-lg font-bold mb-2">Auto-Graded Pre-Lab Check</h3>
+                    <p class="text-sm text-gray-600 mb-4">
+                        Answer both questions correctly before continuing. Incorrect attempts provide a hint.
+                    </p>
 
-                        <label class="block">
-                            <span class="font-semibold">Why is <code>setVelocity()</code> not used?</span>
-                            <textarea class="response-input persist-text mt-2" rows="2"
-                                data-key="setup-q2"
-                                placeholder="Write a brief answer..."></textarea>
-                        </label>
+                    <div class="quiz-stack">
+                        <fieldset class="quiz-card auto-question" data-question-id="setup-duty-limit">
+                            <legend class="quiz-title">
+                                Why must the duty-cycle command be limited?
+                                <span class="quiz-points">1 point</span>
+                            </legend>
+                            <label class="quiz-option"><input type="radio" name="setup-duty-limit" value="a"><span>To force the motor to maintain exactly the same speed under every load.</span></label>
+                            <label class="quiz-option"><input type="radio" name="setup-duty-limit" value="b"><span>To keep the command inside the approved actuator and apparatus safety range.</span></label>
+                            <label class="quiz-option"><input type="radio" name="setup-duty-limit" value="c"><span>To improve the resolution of the integrated encoder.</span></label>
+                            <label class="quiz-option"><input type="radio" name="setup-duty-limit" value="d"><span>To enable the SPARK MAX internal velocity controller.</span></label>
+                            <div class="quiz-actions">
+                                <button type="button" class="quiz-check-button" onclick="gradeQuestion(this)">Check answer</button>
+                                <span class="attempt-count" data-attempts-for="setup-duty-limit"></span>
+                            </div>
+                            <div class="quiz-feedback" data-feedback-for="setup-duty-limit" role="status" aria-live="polite"></div>
+                        </fieldset>
+
+                        <fieldset class="quiz-card auto-question" data-question-id="setup-setvelocity">
+                            <legend class="quiz-title">
+                                Why is <code>motor.setVelocity(...)</code> prohibited in this lab?
+                                <span class="quiz-points">1 point</span>
+                            </legend>
+                            <label class="quiz-option"><input type="radio" name="setup-setvelocity" value="a"><span>It sends an open-loop duty-cycle command that is too small.</span></label>
+                            <label class="quiz-option"><input type="radio" name="setup-setvelocity" value="b"><span>It disables encoder telemetry from the motor controller.</span></label>
+                            <label class="quiz-option"><input type="radio" name="setup-setvelocity" value="c"><span>It would run the SPARK MAX internal speed loop and bypass the PID calculation students must implement in MATLAB.</span></label>
+                            <label class="quiz-option"><input type="radio" name="setup-setvelocity" value="d"><span>It can only be used when the reference speed is negative.</span></label>
+                            <div class="quiz-actions">
+                                <button type="button" class="quiz-check-button" onclick="gradeQuestion(this)">Check answer</button>
+                                <span class="attempt-count" data-attempts-for="setup-setvelocity"></span>
+                            </div>
+                            <div class="quiz-feedback" data-feedback-for="setup-setvelocity" role="status" aria-live="polite"></div>
+                        </fieldset>
                     </div>
                 </div>
             </div>
@@ -954,13 +1226,39 @@ EXPERIMENT_MODE = "OPEN_LOOP";</code></pre>
                                 </label>
                             </div>
 
-                            <label class="block mt-5">
-                                <span class="font-semibold text-sm">
-                                    Why does a fixed duty cycle not guarantee a fixed speed?
-                                </span>
-                                <textarea class="response-input persist-text mt-2" rows="3"
-                                    data-key="openloop-explain"></textarea>
-                            </label>
+                            <div class="quiz-stack mt-5">
+                                <fieldset class="quiz-card auto-question" data-question-id="openloop-fixed-duty">
+                                    <legend class="quiz-title">
+                                        Why does a fixed duty cycle not guarantee a fixed speed?
+                                        <span class="quiz-points">1 point</span>
+                                    </legend>
+                                    <label class="quiz-option"><input type="radio" name="openloop-fixed-duty" value="a"><span>A fixed fraction of voltage always creates a fixed motor speed.</span></label>
+                                    <label class="quiz-option"><input type="radio" name="openloop-fixed-duty" value="b"><span>The encoder automatically holds the shaft at its first measured speed.</span></label>
+                                    <label class="quiz-option"><input type="radio" name="openloop-fixed-duty" value="c"><span>Speed also depends on load, friction, supply voltage, and back-EMF, and open loop has no feedback correction.</span></label>
+                                    <label class="quiz-option"><input type="radio" name="openloop-fixed-duty" value="d"><span>The duty cycle automatically increases whenever the load increases.</span></label>
+                                    <div class="quiz-actions">
+                                        <button type="button" class="quiz-check-button" onclick="gradeQuestion(this)">Check answer</button>
+                                        <span class="attempt-count" data-attempts-for="openloop-fixed-duty"></span>
+                                    </div>
+                                    <div class="quiz-feedback" data-feedback-for="openloop-fixed-duty" role="status" aria-live="polite"></div>
+                                </fieldset>
+
+                                <fieldset class="quiz-card auto-question" data-question-id="openloop-sign">
+                                    <legend class="quiz-title">
+                                        A positive duty cycle produces a negative measured speed. What should you do?
+                                        <span class="quiz-points">1 point</span>
+                                    </legend>
+                                    <label class="quiz-option"><input type="radio" name="openloop-sign" value="a"><span>Increase <code>Kp</code> until the sign changes.</span></label>
+                                    <label class="quiz-option"><input type="radio" name="openloop-sign" value="b"><span>Stop and correct the sign convention before closing the feedback loop.</span></label>
+                                    <label class="quiz-option"><input type="radio" name="openloop-sign" value="c"><span>Continue because integral action will correct the sign automatically.</span></label>
+                                    <label class="quiz-option"><input type="radio" name="openloop-sign" value="d"><span>Take the absolute value of every velocity measurement.</span></label>
+                                    <div class="quiz-actions">
+                                        <button type="button" class="quiz-check-button" onclick="gradeQuestion(this)">Check answer</button>
+                                        <span class="attempt-count" data-attempts-for="openloop-sign"></span>
+                                    </div>
+                                    <div class="quiz-feedback" data-feedback-for="openloop-sign" role="status" aria-live="polite"></div>
+                                </fieldset>
+                            </div>
                         </div>
                     </div>
 
@@ -1075,13 +1373,39 @@ controlUnsaturated = P;</code></pre>
                         </div>
 
                         <div id="p-analysis" class="tab-content p-6">
-                            <label class="block">
-                                <span class="font-semibold text-sm">
-                                    Why does proportional control commonly leave steady-state error?
-                                </span>
-                                <textarea class="response-input persist-text mt-2" rows="4"
-                                    data-key="p-analysis"></textarea>
-                            </label>
+                            <div class="quiz-stack">
+                                <fieldset class="quiz-card auto-question" data-question-id="p-steady-error">
+                                    <legend class="quiz-title">
+                                        Why can proportional control leave steady-state error?
+                                        <span class="quiz-points">1 point</span>
+                                    </legend>
+                                    <label class="quiz-option"><input type="radio" name="p-steady-error" value="a"><span>With load and friction, a nonzero proportional control effort generally requires a nonzero error.</span></label>
+                                    <label class="quiz-option"><input type="radio" name="p-steady-error" value="b"><span>The encoder cannot measure a speed exactly equal to the reference.</span></label>
+                                    <label class="quiz-option"><input type="radio" name="p-steady-error" value="c"><span><code>Kp</code> accumulates error too slowly over time.</span></label>
+                                    <label class="quiz-option"><input type="radio" name="p-steady-error" value="d"><span>The duty-cycle command can only be positive.</span></label>
+                                    <div class="quiz-actions">
+                                        <button type="button" class="quiz-check-button" onclick="gradeQuestion(this)">Check answer</button>
+                                        <span class="attempt-count" data-attempts-for="p-steady-error"></span>
+                                    </div>
+                                    <div class="quiz-feedback" data-feedback-for="p-steady-error" role="status" aria-live="polite"></div>
+                                </fieldset>
+
+                                <fieldset class="quiz-card auto-question" data-question-id="p-kp-trend">
+                                    <legend class="quiz-title">
+                                        What is the most likely trade-off when <code>Kp</code> is increased?
+                                        <span class="quiz-points">1 point</span>
+                                    </legend>
+                                    <label class="quiz-option"><input type="radio" name="p-kp-trend" value="a"><span>The response becomes slower but completely noise-free.</span></label>
+                                    <label class="quiz-option"><input type="radio" name="p-kp-trend" value="b"><span>Steady-state error is always eliminated with no stability risk.</span></label>
+                                    <label class="quiz-option"><input type="radio" name="p-kp-trend" value="c"><span>The response may become faster with smaller error, but overshoot, noise sensitivity, and oscillation risk can increase.</span></label>
+                                    <label class="quiz-option"><input type="radio" name="p-kp-trend" value="d"><span>Only the reference profile changes; the closed-loop response does not.</span></label>
+                                    <div class="quiz-actions">
+                                        <button type="button" class="quiz-check-button" onclick="gradeQuestion(this)">Check answer</button>
+                                        <span class="attempt-count" data-attempts-for="p-kp-trend"></span>
+                                    </div>
+                                    <div class="quiz-feedback" data-feedback-for="p-kp-trend" role="status" aria-live="polite"></div>
+                                </fieldset>
+                            </div>
                         </div>
                     </div>
 
@@ -1214,13 +1538,39 @@ end</code></pre>
                                 </table>
                             </div>
 
-                            <label class="block">
-                                <span class="font-semibold text-sm">
-                                    How did anti-windup change the response after saturation?
-                                </span>
-                                <textarea class="response-input persist-text mt-2" rows="3"
-                                    data-key="pi-explain"></textarea>
-                            </label>
+                            <div class="quiz-stack">
+                                <fieldset class="quiz-card auto-question" data-question-id="pi-integral-purpose">
+                                    <legend class="quiz-title">
+                                        What is the main role of integral action in this speed controller?
+                                        <span class="quiz-points">1 point</span>
+                                    </legend>
+                                    <label class="quiz-option"><input type="radio" name="pi-integral-purpose" value="a"><span>Predict the future reference speed.</span></label>
+                                    <label class="quiz-option"><input type="radio" name="pi-integral-purpose" value="b"><span>Accumulate persistent error so the controller can reduce or eliminate steady-state error.</span></label>
+                                    <label class="quiz-option"><input type="radio" name="pi-integral-purpose" value="c"><span>Filter high-frequency encoder noise.</span></label>
+                                    <label class="quiz-option"><input type="radio" name="pi-integral-purpose" value="d"><span>Set the SPARK MAX current limit.</span></label>
+                                    <div class="quiz-actions">
+                                        <button type="button" class="quiz-check-button" onclick="gradeQuestion(this)">Check answer</button>
+                                        <span class="attempt-count" data-attempts-for="pi-integral-purpose"></span>
+                                    </div>
+                                    <div class="quiz-feedback" data-feedback-for="pi-integral-purpose" role="status" aria-live="polite"></div>
+                                </fieldset>
+
+                                <fieldset class="quiz-card auto-question" data-question-id="pi-antiwindup">
+                                    <legend class="quiz-title">
+                                        Which conditional-integration rule is appropriate for basic anti-windup?
+                                        <span class="quiz-points">1 point</span>
+                                    </legend>
+                                    <label class="quiz-option"><input type="radio" name="pi-antiwindup" value="a"><span>Always update the integral state, including during saturation.</span></label>
+                                    <label class="quiz-option"><input type="radio" name="pi-antiwindup" value="b"><span>Reset the integral state to zero after every sample.</span></label>
+                                    <label class="quiz-option"><input type="radio" name="pi-antiwindup" value="c"><span>Integrate only when saturation and error push the command farther beyond the limit.</span></label>
+                                    <label class="quiz-option"><input type="radio" name="pi-antiwindup" value="d"><span>Integrate when unsaturated, or when the error would drive a saturated command back toward the valid range.</span></label>
+                                    <div class="quiz-actions">
+                                        <button type="button" class="quiz-check-button" onclick="gradeQuestion(this)">Check answer</button>
+                                        <span class="attempt-count" data-attempts-for="pi-antiwindup"></span>
+                                    </div>
+                                    <div class="quiz-feedback" data-feedback-for="pi-antiwindup" role="status" aria-live="polite"></div>
+                                </fieldset>
+                            </div>
                         </div>
                     </div>
 
@@ -1316,21 +1666,21 @@ controlUnsaturated = P + I + D;</code></pre>
                         </div>
 
                         <div id="pid-analysis" class="tab-content p-6">
-                            <label class="block mb-5">
-                                <span class="font-semibold text-sm">
-                                    Did derivative action reduce overshoot or settling time?
-                                </span>
-                                <textarea class="response-input persist-text mt-2" rows="3"
-                                    data-key="pid-benefit"></textarea>
-                            </label>
-
-                            <label class="block">
-                                <span class="font-semibold text-sm">
-                                    How did the derivative filter affect the duty-cycle signal?
-                                </span>
-                                <textarea class="response-input persist-text mt-2" rows="3"
-                                    data-key="pid-filter-answer"></textarea>
-                            </label>
+                            <fieldset class="quiz-card auto-question" data-question-id="pid-derivative-filter">
+                                <legend class="quiz-title">
+                                    Which statement best describes derivative-on-measurement with filtering?
+                                    <span class="quiz-points">1 point</span>
+                                </legend>
+                                <label class="quiz-option"><input type="radio" name="pid-derivative-filter" value="a"><span>Differentiating the reference is preferred because it creates a helpful kick at every reference step.</span></label>
+                                <label class="quiz-option"><input type="radio" name="pid-derivative-filter" value="b"><span>Derivative-on-measurement avoids reference-step derivative kick, while filtering trades noise reduction for added lag.</span></label>
+                                <label class="quiz-option"><input type="radio" name="pid-derivative-filter" value="c"><span>Filtering removes all measurement noise without changing the controller dynamics.</span></label>
+                                <label class="quiz-option"><input type="radio" name="pid-derivative-filter" value="d"><span>Derivative action is an alternative way to accumulate steady-state error.</span></label>
+                                <div class="quiz-actions">
+                                    <button type="button" class="quiz-check-button" onclick="gradeQuestion(this)">Check answer</button>
+                                    <span class="attempt-count" data-attempts-for="pid-derivative-filter"></span>
+                                </div>
+                                <div class="quiz-feedback" data-feedback-for="pid-derivative-filter" role="status" aria-live="polite"></div>
+                            </fieldset>
                         </div>
                     </div>
 
@@ -1407,6 +1757,22 @@ ARTIFICIAL_DELAY_S = 0.05;</code></pre>
                     <div class="warning-card">
                         Use only instructor-approved delay values. Keep the gains and reference profile unchanged.
                     </div>
+
+                    <fieldset class="quiz-card auto-question mt-5" data-question-id="delay-stability">
+                        <legend class="quiz-title">
+                            Why can added computation or communication delay make a closed loop less stable?
+                            <span class="quiz-points">1 point</span>
+                        </legend>
+                        <label class="quiz-option"><input type="radio" name="delay-stability" value="a"><span>Delay increases phase margin and makes corrections more current.</span></label>
+                        <label class="quiz-option"><input type="radio" name="delay-stability" value="b"><span>Delay has no effect when the PID gains remain unchanged.</span></label>
+                        <label class="quiz-option"><input type="radio" name="delay-stability" value="c"><span>Delay adds phase lag, so the controller acts on older information and can increase overshoot or oscillation.</span></label>
+                        <label class="quiz-option"><input type="radio" name="delay-stability" value="d"><span>Delay only changes the numerical value of the reference speed.</span></label>
+                        <div class="quiz-actions">
+                            <button type="button" class="quiz-check-button" onclick="gradeQuestion(this)">Check answer</button>
+                            <span class="attempt-count" data-attempts-for="delay-stability"></span>
+                        </div>
+                        <div class="quiz-feedback" data-feedback-for="delay-stability" role="status" aria-live="polite"></div>
+                    </fieldset>
                 </div>
             </div>
 
@@ -1464,16 +1830,34 @@ ARTIFICIAL_DELAY_S = 0.05;</code></pre>
             </div>
 
             <div class="grid lg:grid-cols-2 gap-6">
-                <div class="card p-7">
-                    <h3 class="text-xl font-bold mb-4">Final Recommendation</h3>
+                <div class="card p-7 border-t-4 border-[#7A003C]">
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+                        <h3 class="text-xl font-bold">Instructor-Graded Synthesis</h3>
+                        <span class="stage-summary-chip">20 points</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-4">
+                        This is the only written response graded by the instructor. Use your measured results as evidence.
+                    </p>
                     <label class="block">
                         <span class="font-semibold text-sm">
-                            Which controller would you choose for this motor-speed application, and why?
+                            Recommend P, PI, or PID control for this apparatus. Defend your choice using quantitative
+                            evidence from your trials, explain the most important trade-off, and discuss what the delay
+                            experiment reveals about robustness and stability.
                         </span>
-                        <textarea class="response-input persist-text mt-2" rows="8"
+                        <textarea class="response-input persist-text mt-3" rows="10"
                             data-key="final-recommendation"
-                            placeholder="Discuss tracking, overshoot, settling time, control effort, noise, and robustness..."></textarea>
+                            data-min-words="120"
+                            placeholder="Write at least 120 words. Refer to measured rise time, overshoot, steady-state error, IAE, control effort, noise, saturation, and delay where relevant..."></textarea>
+                        <div class="word-count" data-word-count-for="final-recommendation">0 words · minimum 120</div>
                     </label>
+
+                    <h4 class="font-bold text-sm mt-5">Instructor rubric</h4>
+                    <ul class="rubric-list">
+                        <li><span>Accurate use of measured evidence</span><strong>6</strong></li>
+                        <li><span>Comparison of controller performance and trade-offs</span><strong>6</strong></li>
+                        <li><span>Delay, robustness, and stability reasoning</span><strong>4</strong></li>
+                        <li><span>Clear, defensible engineering recommendation</span><strong>4</strong></li>
+                    </ul>
                 </div>
 
                 <div class="card p-7">
@@ -1509,7 +1893,7 @@ ARTIFICIAL_DELAY_S = 0.05;</code></pre>
 
             <div class="stage-footer">
                 <button class="nav-button secondary" onclick="setStage(4)">Back to PID Control</button>
-                <button class="nav-button primary" onclick="markStageComplete(5)">
+                <button class="nav-button primary" onclick="completeStage(5)">
                     Mark Final Analysis Complete
                 </button>
             </div>
@@ -1524,6 +1908,71 @@ ARTIFICIAL_DELAY_S = 0.05;</code></pre>
         hljs.highlightAll();
 
         const TOTAL_STAGES = 6;
+
+        const QUIZ_ANSWERS = {
+            'setup-duty-limit': {
+                correct: 'b',
+                hint: 'Think about what the command limit protects when the controller or gains are not yet validated.',
+                explanation: 'Correct. The limit constrains the actuator command to the provisional range approved for the apparatus. It does not regulate speed by itself.'
+            },
+            'setup-setvelocity': {
+                correct: 'c',
+                hint: 'Ask which device would perform the closed-loop speed calculation if setVelocity were used.',
+                explanation: 'Correct. setVelocity() delegates speed regulation to the SPARK MAX. This lab requires MATLAB to calculate the sampled PID output and send duty cycle.'
+            },
+            'openloop-fixed-duty': {
+                correct: 'c',
+                hint: 'Open loop does not compare measured speed with the reference after the command is applied.',
+                explanation: 'Correct. Load torque, friction, supply voltage, and motor back-EMF affect speed. Without feedback, the command does not automatically compensate for those changes.'
+            },
+            'openloop-sign': {
+                correct: 'b',
+                hint: 'Closing a negative-feedback loop with the wrong sign can turn it into positive feedback.',
+                explanation: 'Correct. Stop and fix the sign convention before enabling feedback. Using an absolute value would hide direction and is not a valid correction.'
+            },
+            'p-steady-error': {
+                correct: 'a',
+                hint: 'For proportional control, output equals Kp multiplied by error. What must be nonzero to produce a sustained nonzero output?',
+                explanation: 'Correct. When the motor needs ongoing control effort to balance load and losses, proportional action usually requires a persistent nonzero error.'
+            },
+            'p-kp-trend': {
+                correct: 'c',
+                hint: 'Higher gain strengthens correction, but stronger correction is not free of dynamic consequences.',
+                explanation: 'Correct. Increasing Kp can improve speed and reduce error, but it can also amplify noise and increase overshoot or oscillatory behaviour.'
+            },
+            'pi-integral-purpose': {
+                correct: 'b',
+                hint: 'Integral action remembers error over multiple samples.',
+                explanation: 'Correct. Accumulating persistent error builds the additional control effort needed to reduce or eliminate steady-state error.'
+            },
+            'pi-antiwindup': {
+                correct: 'd',
+                hint: 'The integral should stop making saturation worse, but it should still be allowed to help the command return toward the allowable range.',
+                explanation: 'Correct. Conditional integration permits normal integration when unsaturated and permits unwinding when the error drives a saturated command back toward the valid range.'
+            },
+            'pid-derivative-filter': {
+                correct: 'b',
+                hint: 'Consider both reference-step derivative kick and the effect of smoothing noisy measurements.',
+                explanation: 'Correct. Differentiating measurement avoids reference-step kick. Filtering reduces noise amplification, but additional smoothing also adds lag.'
+            },
+            'delay-stability': {
+                correct: 'c',
+                hint: 'The controller is correcting an error measured in the past rather than the current state.',
+                explanation: 'Correct. Delay adds phase lag and reduces stability margin. With unchanged gains, overshoot and oscillation can increase.'
+            }
+        };
+
+        function initializeAutogradingVersion() {
+            const version = '1';
+            const versionKey = 'week8-autograding-version';
+
+            if (localStorage.getItem(versionKey) !== version) {
+                for (let stage = 0; stage < TOTAL_STAGES; stage++) {
+                    localStorage.removeItem(`week8-stage-${stage}-complete`);
+                }
+                localStorage.setItem(versionKey, version);
+            }
+        }
 
         function setStage(stage) {
             document.body.className = `pb-24 pt-24 stage-${stage}`;
@@ -1548,9 +1997,129 @@ ARTIFICIAL_DELAY_S = 0.05;</code></pre>
             updateCompletionUI();
         }
 
-        function completeAndGo(stage, nextStage) {
+        function completeStage(stage) {
+            const validation = validateStage(stage);
+
+            if (!validation.ok) {
+                showStageMessage(stage, validation.message, 'error');
+                return false;
+            }
+
             markStageComplete(stage);
-            setStage(nextStage);
+            showStageMessage(
+                stage,
+                stage === 5
+                    ? 'Final analysis requirements are complete. Submit the requested files through the course submission system.'
+                    : 'Stage complete. Your progress has been saved in this browser.',
+                'success'
+            );
+            return true;
+        }
+
+        function completeAndGo(stage, nextStage) {
+            if (completeStage(stage)) {
+                setStage(nextStage);
+            }
+        }
+
+        function validateStage(stage) {
+            const panel = document.querySelector(`.stage-panel.stage-${stage}`);
+            if (!panel) return { ok: false, message: 'This stage could not be found.' };
+
+            const unansweredQuiz = [...panel.querySelectorAll('.auto-question')]
+                .filter(question => {
+                    const id = question.dataset.questionId;
+                    return localStorage.getItem(`week8-quiz-${id}-correct`) !== 'true';
+                });
+
+            if (unansweredQuiz.length > 0) {
+                return {
+                    ok: false,
+                    message: `Complete all auto-graded knowledge checks in this stage. ${unansweredQuiz.length} question${unansweredQuiz.length === 1 ? '' : 's'} remain.`
+                };
+            }
+
+            const uncheckedBoxes = [...panel.querySelectorAll('.persist-check')]
+                .filter(input => !input.checked);
+
+            if (uncheckedBoxes.length > 0) {
+                return {
+                    ok: false,
+                    message: `Confirm every required checklist item before completing this stage. ${uncheckedBoxes.length} item${uncheckedBoxes.length === 1 ? '' : 's'} remain.`
+                };
+            }
+
+            const emptyFields = [...panel.querySelectorAll('.persist-text')]
+                .filter(input => input.value.trim() === '');
+
+            if (emptyFields.length > 0) {
+                emptyFields[0].focus();
+                return {
+                    ok: false,
+                    message: `Fill every required experiment or analysis field. ${emptyFields.length} field${emptyFields.length === 1 ? '' : 's'} remain.`
+                };
+            }
+
+            const invalidNumbers = [...panel.querySelectorAll('input[type="number"].persist-text')]
+                .filter(input => !Number.isFinite(Number(input.value)) || Number(input.value) < 0);
+
+            if (invalidNumbers.length > 0) {
+                invalidNumbers[0].focus();
+                return {
+                    ok: false,
+                    message: 'Enter valid nonnegative numerical measurements before continuing.'
+                };
+            }
+
+            if (stage === 1) {
+                const direction = panel.querySelector('[data-key="openloop-sign"]');
+                if (direction && direction.value !== 'Yes') {
+                    direction.focus();
+                    return {
+                        ok: false,
+                        message: 'Do not continue to closed-loop control until positive duty cycle produces positive measured speed.'
+                    };
+                }
+            }
+
+            const minimumWordField = panel.querySelector('[data-min-words]');
+            if (minimumWordField) {
+                const minimum = Number(minimumWordField.dataset.minWords);
+                const words = countWords(minimumWordField.value);
+                if (words < minimum) {
+                    minimumWordField.focus();
+                    return {
+                        ok: false,
+                        message: `The instructor-graded synthesis requires at least ${minimum} words. Current count: ${words}.`
+                    };
+                }
+            }
+
+            return { ok: true, message: '' };
+        }
+
+        function showStageMessage(stage, message, type) {
+            const panel = document.querySelector(`.stage-panel.stage-${stage}`);
+            if (!panel) return;
+
+            let messageBox = panel.querySelector('.stage-message');
+            if (!messageBox) {
+                messageBox = document.createElement('div');
+                messageBox.className = 'stage-message';
+                messageBox.setAttribute('role', 'status');
+                messageBox.setAttribute('aria-live', 'polite');
+
+                const footer = panel.querySelector('.stage-footer');
+                if (footer) {
+                    footer.before(messageBox);
+                } else {
+                    panel.appendChild(messageBox);
+                }
+            }
+
+            messageBox.textContent = message;
+            messageBox.className = `stage-message show ${type}`;
+            messageBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
         function updateCompletionUI() {
@@ -1563,6 +2132,103 @@ ARTIFICIAL_DELAY_S = 0.05;</code></pre>
 
                 button.classList.toggle('completed', complete);
             }
+        }
+
+        function updateAutoScore() {
+            const earned = Object.keys(QUIZ_ANSWERS).filter(id =>
+                localStorage.getItem(`week8-quiz-${id}-correct`) === 'true'
+            ).length;
+
+            const score = document.getElementById('autoScoreValue');
+            if (score) score.textContent = `${earned}/${Object.keys(QUIZ_ANSWERS).length}`;
+        }
+
+        function gradeQuestion(button) {
+            const question = button.closest('.auto-question');
+            const id = question.dataset.questionId;
+            const answer = QUIZ_ANSWERS[id];
+            const selected = question.querySelector('input:checked');
+            const feedback = question.querySelector(`[data-feedback-for="${id}"]`);
+
+            if (!selected) {
+                feedback.textContent = 'Select an answer before checking.';
+                feedback.className = 'quiz-feedback show incorrect';
+                question.classList.remove('correct');
+                question.classList.add('incorrect');
+                return;
+            }
+
+            const attemptsKey = `week8-quiz-${id}-attempts`;
+            const attempts = Number(localStorage.getItem(attemptsKey) || 0) + 1;
+            localStorage.setItem(attemptsKey, String(attempts));
+            localStorage.setItem(`week8-quiz-${id}-selection`, selected.value);
+            updateAttemptDisplay(id, attempts);
+
+            if (selected.value === answer.correct) {
+                localStorage.setItem(`week8-quiz-${id}-correct`, 'true');
+                question.classList.remove('incorrect');
+                question.classList.add('correct');
+                feedback.textContent = answer.explanation;
+                feedback.className = 'quiz-feedback show correct';
+                lockQuestion(question);
+            } else {
+                localStorage.setItem(`week8-quiz-${id}-correct`, 'false');
+                question.classList.remove('correct');
+                question.classList.add('incorrect');
+                feedback.textContent = `Not yet. ${answer.hint}`;
+                feedback.className = 'quiz-feedback show incorrect';
+            }
+
+            updateAutoScore();
+        }
+
+        function lockQuestion(question) {
+            question.querySelectorAll('input').forEach(input => {
+                input.disabled = true;
+            });
+
+            const button = question.querySelector('.quiz-check-button');
+            if (button) {
+                button.disabled = true;
+                button.textContent = 'Correct';
+            }
+        }
+
+        function restoreQuizState() {
+            document.querySelectorAll('.auto-question').forEach(question => {
+                const id = question.dataset.questionId;
+                const selectedValue = localStorage.getItem(`week8-quiz-${id}-selection`);
+                const correct = localStorage.getItem(`week8-quiz-${id}-correct`) === 'true';
+                const attempts = Number(localStorage.getItem(`week8-quiz-${id}-attempts`) || 0);
+
+                question.querySelectorAll('input').forEach(input => {
+                    input.checked = input.value === selectedValue;
+
+                    input.addEventListener('change', () => {
+                        localStorage.setItem(`week8-quiz-${id}-selection`, input.value);
+                    });
+                });
+
+                updateAttemptDisplay(id, attempts);
+
+                if (correct) {
+                    const feedback = question.querySelector(`[data-feedback-for="${id}"]`);
+                    question.classList.add('correct');
+                    feedback.textContent = QUIZ_ANSWERS[id].explanation;
+                    feedback.className = 'quiz-feedback show correct';
+                    lockQuestion(question);
+                }
+            });
+
+            updateAutoScore();
+        }
+
+        function updateAttemptDisplay(id, attempts) {
+            const target = document.querySelector(`[data-attempts-for="${id}"]`);
+            if (!target) return;
+            target.textContent = attempts > 0
+                ? `${attempts} attempt${attempts === 1 ? '' : 's'}`
+                : '';
         }
 
         function switchTab(button) {
@@ -1598,6 +2264,20 @@ ARTIFICIAL_DELAY_S = 0.05;</code></pre>
             if (!wasOpen) selected.classList.add('active');
         }
 
+        function countWords(value) {
+            const trimmed = value.trim();
+            return trimmed ? trimmed.split(/\s+/).length : 0;
+        }
+
+        function updateWordCount(input) {
+            const target = document.querySelector(`[data-word-count-for="${input.dataset.key}"]`);
+            if (!target) return;
+
+            const words = countWords(input.value);
+            const minimum = Number(input.dataset.minWords || 0);
+            target.textContent = `${words} word${words === 1 ? '' : 's'}${minimum ? ` · minimum ${minimum}` : ''}`;
+        }
+
         function restorePersistentInputs() {
             document.querySelectorAll('.persist-check').forEach(input => {
                 input.checked = localStorage.getItem(`week8-${input.dataset.key}`) === 'true';
@@ -1614,21 +2294,22 @@ ARTIFICIAL_DELAY_S = 0.05;</code></pre>
                 const saved = localStorage.getItem(`week8-${input.dataset.key}`);
                 if (saved !== null) input.value = saved;
 
-                const eventName =
-                    input.tagName === 'SELECT' ? 'change' : 'input';
+                if (input.dataset.minWords) updateWordCount(input);
+
+                const eventName = input.tagName === 'SELECT' ? 'change' : 'input';
 
                 input.addEventListener(eventName, () => {
-                    localStorage.setItem(
-                        `week8-${input.dataset.key}`,
-                        input.value
-                    );
+                    localStorage.setItem(`week8-${input.dataset.key}`, input.value);
+                    if (input.dataset.minWords) updateWordCount(input);
                 });
             });
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            initializeAutogradingVersion();
             updateCompletionUI();
             restorePersistentInputs();
+            restoreQuizState();
 
             const savedStage = Number(
                 localStorage.getItem('week8-current-stage') ?? 0
